@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerControllerExam05 : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class PlayerControllerExam05 : MonoBehaviour
 
     // Exam 05 ...
     public int maxBulletCount = 10;
+    int bulletCount = 0;
     public float bulletRegenerateCooldown = 1f;
     // ...
 
@@ -21,6 +23,7 @@ public class PlayerControllerExam05 : MonoBehaviour
     {
         moveAction = InputSystem.actions.FindAction("Move");
         shootAction = InputSystem.actions.FindAction("Shoot");
+
     }
 
     // Update is called once per frame
@@ -40,7 +43,23 @@ public class PlayerControllerExam05 : MonoBehaviour
 
         if (shootAction.triggered)
         {
-            Instantiate(projectilePrefab, transform.position, transform.rotation);
+            bulletCount++;
+            Instantiate(projectilePrefab, transform.position, projectilePrefab.transform.rotation);
+            if (bulletCount >= maxBulletCount)
+            {
+                Debug.Log("Reloading");
+                StartCoroutine(Reload());
+                shootAction.Disable();
+            }
         }
+    }
+    private IEnumerator Reload()
+    {
+
+        yield return new WaitForSeconds(bulletRegenerateCooldown);
+        Debug.Log("Finish");
+        bulletCount = 0;
+        shootAction.Enable();
+
     }
 }
